@@ -45,7 +45,7 @@ var lagBusStops = [
       "region": "VI"
     }];
 
-router.route('/busstops')
+router.route('/')
 .get(function(request, response) {
   if(request.query.region) {
     var a = [], i;
@@ -88,7 +88,7 @@ router.route('/busstops')
   }
 });
 
-router.route('/busstops/:name')
+router.route('/:name')
 .get(function(request, response) {
   var i, busStop = request.params.name;
   for(i = 0; i < lagBusStops.length; i++) {
@@ -133,7 +133,7 @@ function createBusStop(n, r){
 }
 
 
-app.use('/lagos', router);
+app.use('/lagos/busstops', router);
 
 app.listen(8080, function() {
   console.log('Listening on port 8080...\n');

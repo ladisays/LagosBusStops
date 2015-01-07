@@ -1,0 +1,15 @@
+{
+  "version": "0.0.0",
+  "private": false,
+  "name": "LagosBusStops",
+  "description": "An ExpressJS API for LagosBusStops",
+  "repository": "https://github.com/andela-ladenusi/LagosBusStops",
+  "license": "Free",
+  "devDependencies": {
+    "express": "~4.10.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.10.1",
+    "express": "~4.10.0"
+  }
+}

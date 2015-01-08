@@ -64,6 +64,16 @@ router.route('/')
 //   }
 // });
 
+// router.route('/busstops')
+// .get(function(request, response) {
+//   BusStopModel.find({}, '-_id name -region', function(err, bs) {
+//     // if(err) {
+//     //   return handleError(err);
+//     // }
+//     response.json(bs);
+//   });
+// });
+
 router.route('/:name')
 .get(function(request, response) {
   BusStopModel.find({name: request.params.name}, '_id name region', function(err, bs) {

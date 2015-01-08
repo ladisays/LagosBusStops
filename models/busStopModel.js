@@ -1,5 +1,10 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/LagosBusStops'); // connect to our database
+// connect to our local database
+// mongoose.connect('mongodb://localhost/LagosBusStops');
+
+//connect to the database hosted on mongolabs.com
+mongoose.connect('mongodb://lagbus:superUser@ds031681.mongolab.com:31681/lagosbusstops');
+
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

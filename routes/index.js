@@ -1,134 +1,101 @@
 var express = require('express');
-var app = express();
 
 var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({extended: false});
 
-var router = express.Router();
+var BusStopModel = require('../models/busStopModel');
 
-var lagBusStops = [
-    {
-      "name": "Jibowu",
-      "region": "Yaba"
-    },
-    {
-      "name": "WAEC",
-      "region": "Yaba"
-    },
-    {
-      "name": "YabaTech",
-      "region": "Yaba"
-    },
-    {
-      "name": "Onigbongbo",
-      "region": "Maryland"
-    },
-    {
-      "name": "Mende",
-      "region": "Maryland"
-    },
-    {
-      "name": "Police College",
-      "region": "Maryland"
-    },
-    {
-      "name": "Law School",
-      "region": "VI"
-    },
-    {
-      "name": "First Gate",
-      "region": "VI"
-    },
-    {
-      "name": "Sandfill",
-      "region": "VI"
-    }];
+var router = express.Router();
 
 router.route('/')
 .get(function(request, response) {
   if(request.query.region) {
-    var a = [], i;
-    for(i = 0; i < lagBusStops.length; i++) {
-      if(lagBusStops[i].region === request.query.region) {
-        a.push(lagBusStops[i].name);
+    BusStopModel.find({region: request.query.region}, '-_id name region', function(err, bs) {
+      if(err) {
+        return handleError(err);
       }
-    }
-    response.json(a);
+      response.json(bs);
+    });
   }
   else {
-    response.json(lagBusStops);
+    BusStopModel.find({}, '-_id name region', function(err, bs) {
+      if(err) {
+        return handleError(err);
+      }
+      response.json(bs);
+    });
   }
 })
 
 .post(parseUrlencoded, function(request, response) {
   if(request.body.region) {
-    var busStop = createBusStop(request.body.name, request.body.region);
-    response.status(201).json(busStop);
+    BusStopModel.create({name: request.body.name, region: request.body.region}, function(err, bs) {
+      if(err) {
+        handleError(err);
+      }
+      response.status(201).json(bs);
+    });
   }
   else {
     response.status(400).json('Invalid Bus-Stop!');
   }
-})
-
-.put(parseUrlencoded, function(request, response) {
-  if(request.query.region) {
-    var busStopRegion = request.query.region;
-    for(i = 0; i < lagBusStops.length; i++) {
-      if(lagBusStops[i].region === busStopRegion) {
-        if(request.body.region) {
-          lagBusStops[i].region = request.body.region;
-          response.status(201).json(lagBusStops[i].region);
-        }
-        else {
-          response.status(400).json('Invalid Bus Region!');
-        }
-      }
-    }
-  }
 });
+
+// .put(parseUrlencoded, function(request, response) {
+//   if(request.query.region) {
+//     var query = {region: request.query.region};
+//     BusStopModel.update(query, { $set: {region: request.body.region}}, function(err, bs) {
+//       if(err) {
+//         return handleError(err);
+//       }
+//       response.status(201).json(bs + ' document(s) affected.');
+//     });
+//     // for(i = 0; i < lagBusStops.length; i++) {
+//     //   if(lagBusStops[i].region === busStopRegion) {
+//     //     if(request.body.region) {
+//     //       lagBusStops[i].region = request.body.region;
+//     //       response.status(201).json(lagBusStops[i].region);
+//     //     }
+//     //     else {
+//     //       response.status(400).json('Invalid Bus Region!');
+//     //     }
+//     //   }
+//     // }
+//   }
+// });
 
 router.route('/:name')
 .get(function(request, response) {
-  var i, busStop = request.params.name;
-  for(i = 0; i < lagBusStops.length; i++) {
-    if(lagBusStops[i].name === busStop) {
-      return response.json(lagBusStops[i]);
+  BusStopModel.find({name: request.params.name}, '_id name region', function(err, bs) {
+    if(err) {
+      return handleError(err);
     }
-  }
-  response.status(404).json("Bus-stop not found!");
+    response.json(bs);
+  });
+  // Can't seem to resolve the error when a bus stop is not found!
+  // response.status(404).json("Bus-stop not found!"); 
 })
 
 .put(parseUrlencoded, function(request, response) {
-  var busStop = request.params.name;
-  for(i = 0; i < lagBusStops.length; i++) {
-    if(lagBusStops[i].name === busStop) {
-      if(request.body.name) {
-        lagBusStops[i].name = request.body.name;
-        response.status(201).json(lagBusStops[i].name);
-      }
-      else {
-        response.status(400).json('Invalid Bus-Stop!');
-      }
+  var query = {name: request.params.name};
+  BusStopModel.update(query, { $set: {name: request.body.name}}, function(err, bs) {
+    if(err) {
+      return handleError(err);
     }
-  }
+    response.status(201).json(bs + ' document was affected');
+  });
 })
 
 .delete(function(request, response) {
-  var i, busStop = request.params.name;
-  for(i = 0; i < lagBusStops.length; i++) {
-    if(lagBusStops[i].name === busStop) {
-      lagBusStops.splice(i, 1);
-      response.sendStatus(200);
+  var i, query = {name: request.params.name};
+  BusStopModel.remove(query, function(err, bs) {
+    if(err) {
+      return handleError(err);
     }
-  }
-  response.sendStatus(404);
+    response.status(200).json(bs + ' document was removed!');
+  })
+  // response.sendStatus(404);
 });
 
-
-
-function createBusStop(n, r){
-  lagBusStops.push({"name": n, "region": r});
-  return n;
-}
 
 module.exports = router;

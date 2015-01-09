@@ -10,7 +10,8 @@ var router = express.Router();
 router.route('/')
 .get(function(request, response) {
   if(request.query.region) {
-    BusStopModel.find({region: request.query.region}, '-_id name region', function(err, bs) {
+    var query = parser(request.query.region);
+    BusStopModel.find({region: query}, '-_id name region', function(err, bs) {
       if(err) {
         return handleError(err);
       }
@@ -29,7 +30,9 @@ router.route('/')
 
 .post(parseUrlencoded, function(request, response) {
   if(request.body.region) {
-    BusStopModel.create({name: request.body.name, region: request.body.region}, function(err, bs) {
+    var newName = parser(request.body.name);
+    var newRegion = parser(request.body.region);
+    BusStopModel.create({name: newName, region: newRegion}, function(err, bs) {
       if(err) {
         handleError(err);
       }
@@ -76,7 +79,8 @@ router.route('/')
 
 router.route('/:name')
 .get(function(request, response) {
-  BusStopModel.find({name: request.params.name}, '_id name region', function(err, bs) {
+  var query = parser(request.params.name);
+  BusStopModel.find({name: query}, '_id name region', function(err, bs) {
     if(err) {
       return handleError(err);
     }
@@ -87,7 +91,7 @@ router.route('/:name')
 })
 
 .put(parseUrlencoded, function(request, response) {
-  var query = {name: request.params.name};
+  var query = {name: parser(request.params.name)};
   BusStopModel.update(query, { $set: {name: request.body.name}}, function(err, bs) {
     if(err) {
       return handleError(err);
@@ -97,7 +101,7 @@ router.route('/:name')
 })
 
 .delete(function(request, response) {
-  var i, query = {name: request.params.name};
+  var i, query = {name: parser(request.params.name)};
   BusStopModel.remove(query, function(err, bs) {
     if(err) {
       return handleError(err);
@@ -107,5 +111,10 @@ router.route('/:name')
   // response.sendStatus(404);
 });
 
+
+function parser(name){
+  var parsedName = name[0].toUpperCase() + name.slice(1).toLowerCase();
+  return parsedName;
+}
 
 module.exports = router;

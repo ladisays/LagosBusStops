@@ -4,6 +4,7 @@
   "name": "LagosBusStops",
   "description": "An ExpressJS API for LagosBusStops",
   "repository": "https://github.com/andela-ladenusi/LagosBusStops",
+  "website": "https://lagbusstops.herokuapp.com",
   "license": "Free",
   "devDependencies": {
     "express": "~4.10.0"
